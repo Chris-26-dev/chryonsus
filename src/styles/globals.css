@@ -123,3 +123,72 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* markdown container helpers: hide native scrollbar but keep scroll functionality and force light look */
+.markdown-body-container {
+  /* use card vars if available, fallback to white */
+  background: var(--card, #ffffff);
+  color: var(--card-foreground, #0f172a);
+}
+.markdown-body-container::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+.markdown-body-container {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Ensure markdown content uses light colors even under .dark */
+.markdown-body-container .markdown-body,
+.markdown-body-container .markdown-body * {
+  color: var(--card-foreground, #0f172a) !important;
+}
+
+/* small helper to reduce code block contrast in light mode */
+.markdown-body-container .markdown-body pre {
+  background: #f8fafc; /* light gray */
+  color: #0f172a; /* dark text */
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #e6edf3;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+}
+
+/* Ensure the entire markdown output is light with dark text */
+.markdown-body-container .markdown-body {
+  background: #ffffff;
+  color: #0f172a !important;
+}
+
+.markdown-body-container .markdown-body * {
+  color: #0f172a !important;
+}
+
+/* inline code */
+.markdown-body-container .markdown-body code {
+  background: #f1f5f9;
+  color: #0b1220;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+}
+
+/* links and headings */
+.markdown-body-container .markdown-body a {
+  color: #0366d6;
+}
+.markdown-body-container .markdown-body h1,
+.markdown-body-container .markdown-body h2,
+.markdown-body-container .markdown-body h3,
+.markdown-body-container .markdown-body h4 {
+  color: #0f172a;
+}
+
+/* images responsive */
+.markdown-body-container .markdown-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
