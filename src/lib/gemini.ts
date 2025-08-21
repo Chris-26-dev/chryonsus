@@ -1,13 +1,19 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Document } from '@langchain/core/documents';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({
     model: 'gemini-2.5-flash',
 })
 
+export async function generateTextFromPrompt(prompt: string) {
+    const response = await model.generateContent([prompt])
+    return response.response.text()
+}
+
 export const aiSummariseCommits = async (diff: string) => {
     const response = await model.generateContent([
-`You are an expert programmer, and you are trying to summarize a git diff.
+        `You are an expert programmer, and you are trying to summarize a git diff.
 Reminders about the git diff format:
 For every file, there are a few metadata lines, like (for example):
 \'\'\'
@@ -35,8 +41,32 @@ The last comment does not include a file names,
 because there were more than two relevant files in the hypothetical commit.
 Do not include parts of the example in your summary.
 It is given only as an example of appropriate comments.`,
-`Please summarize the following diff file: \n\n${diff}`,
+        `Please summarize the following diff file: \n\n${diff}`,
     ]);
-    
+
     return response.response.text();
+}
+
+export async function summariseCode(doc: Document) {
+    console.log("getting summary for", doc.metadata.source);
+    try {
+        const code = doc.pageContent.slice(0, 1000);
+        const response = await model.generateContent([
+            `You are an expert programmer, and you are trying to summarize a code snippet.
+        Please provide a summary for the following code snippet: \n\n${code}`,
+        ]);
+        return response.response.text();
+    } catch (error) {
+        console.error("Error summarizing code:", error);
+        throw new Error("Failed to summarize code");
+    }
+}
+
+export async function generateEmbedding(summary: string) {
+    const model = genAI.getGenerativeModel({
+        model: 'gemini-embedding-001',
+    })
+    const result = await model.embedContent(summary);
+    const embedding = result.embedding;
+    return embedding.values;
 }
